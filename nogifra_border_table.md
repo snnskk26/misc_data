@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 乃木フラ / ボーダー 一覧表
-permalink: nogifra_border_table
+permalink: /nogifra_border_table/
 ---
 
 ## #31 タイムリミット片想い
