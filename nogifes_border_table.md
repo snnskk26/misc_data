@@ -4,6 +4,10 @@ title: 乃木フェス / ボーダー 一覧表
 permalink: /nogifes_border_table/
 ---
 
+<time class="post-modified" datetime="2026-09-27 22:41:04">
+Last modified at 2026-09-27 22:41:04
+</time>
+
 ## Timeless Lap
 
 <dl>

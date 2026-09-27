@@ -4,6 +4,10 @@ title: 乃木恋 / ボーダー 一覧表
 permalink: /nogikoi_border_table/
 ---
 
+<time class="post-modified" datetime="2026-09-27 22:41:06">
+Last modified at 2026-09-27 22:41:06
+</time>
+
 ## ドキクラ！～めざせ♡愛されテディベア女子～Part1
 
 <dl>
