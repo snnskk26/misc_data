@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{{ page.title | default: site.title }}</title>
+
+  <link rel="stylesheet" href="{{ '/style.css' | relative_url }}">
+
+  <!-- Analytics
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+  -->
+</head>
+
+<body>
+
+<header class="post-header">
+  <div class="inner">
+    <a href="{{ '/' | relative_url }}">{{ site.title }}</a>
+  </div>
+  <time class="post-modified" datetime="{{ site.modified }}">
+    Last modified at {{ site.modified | date: "%Y/%m/%d %H:%M:%S" }}
+  </time>
+</header>
+
+<nav>
+  <ul>
+    <li>
+      乃木恋
+      <ul>
+        <li><a href="{{ '/nogikoi_border_table/' | relative_url }}">ボーダー 一覧表</a></li>
+        <li><a href="{{ '/nogikoi_border_mean/' | relative_url }}">ボーダー 平均値</a></li>
+      </ul>
+    </li>
+    <li>
+      乃木フェス
+      <ul>
+        <li><a href="{{ '/nogifes_border_table/' | relative_url }}">ボーダー 一覧表</a></li>
+        <li><a href="{{ '/nogifes_border_mean/' | relative_url }}">ボーダー 平均値</a></li>
+      </ul>
+    </li>
+    <li>
+      乃木フラ
+      <ul>
+        <li><a href="{{ '/nogifra_border_table/' | relative_url }}">ボーダー 一覧表</a></li>
+        <li><a href="{{ '/nogifra_border_mean/' | relative_url }}">ボーダー 平均値</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<main>
+
+<h1>{{ page.title | default: site.title }}</h1>
+
+{{ content }}
+
+</main>
+
+<footer>
+  <div class="inner">
+    <a href="{{ '/' | relative_url }}">トップページに戻る</a>
+    <div>&copy; {{ site.copyright_year }} {{ site.copyright_owner }}</div>
+  </div>
+</footer>
+
+</body>
+</html>
