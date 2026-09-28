@@ -213,6 +213,45 @@ footer a:hover {
   background: var(--primary);
 }
 
+/* tablesorter */
+.tablesorter-default .header,
+.tablesorter-default .tablesorter-header {
+  position: relative;
+  cursor: pointer;
+  padding: 4px 24px 4px 4px;
+}
+
+.tablesorter-default thead .headerSortUp,
+.tablesorter-default thead .tablesorter-headerAsc,
+.tablesorter-default thead .tablesorter-headerSortUp,
+.tablesorter-default thead .headerSortDown,
+.tablesorter-default thead .tablesorter-headerDesc,
+.tablesorter-default thead .tablesorter-headerSortDown {
+  border-bottom: #8e4585 2px solid;
+}
+
+.tablesorter-default .header::after,
+.tablesorter-default .tablesorter-header::after {
+  content: "◆";
+  color: #8e4585;
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.tablesorter-default .headerSortUp::after,
+.tablesorter-default .tablesorter-headerAsc::after,
+.tablesorter-default .tablesorter-headerSortUp::after {
+  content: "▲";
+}
+
+.tablesorter-default .headerSortDown::after,
+.tablesorter-default .tablesorter-headerDesc::after,
+.tablesorter-default .tablesorter-headerSortDown::after {
+  content: "▼";
+}
+
 /* Mobile */
 @media (max-width: 600px) {
   nav > ul {
