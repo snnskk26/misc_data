@@ -29,6 +29,16 @@
     $(function() {
       $("table").tablesorter();
     });
+    jQuery.tablesorter.addParser({
+      id: "suffixedNumber",
+      is: function(s) {
+        return /[0-9]m$/.test(s);
+      },
+      format: function(s) {
+        return jQuery.tablesorter.formatFloat(s.replace(/m$/, ''));
+      },
+      type: "numeric"
+    });
   </script>
 </head>
 
