@@ -1,7 +1,6 @@
 ---
 layout: default
 title: 乃木恋 / ボーダー 一覧表
-permalink: /nogikoi_border_table/
 ---
 
 <time class="post-modified" datetime="2026-09-28 01:59:23">

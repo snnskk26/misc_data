@@ -1,7 +1,6 @@
 ---
 layout: default
 title: 乃木フェス / ボーダー 一覧表
-permalink: /nogifes_border_table/
 ---
 
 <time class="post-modified" datetime="2026-09-28 13:02:34">

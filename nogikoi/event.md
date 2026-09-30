@@ -1,7 +1,6 @@
 ---
 layout: default
 title: 乃木恋 / 彼イベ走り方
-permalink: /nogikoi_event/
 ---
 
 <time class="post-modified" datetime="2026-09-30 19:14:39">

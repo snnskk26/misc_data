@@ -1,7 +1,6 @@
 ---
 layout: default
 title: 乃木フェス / イベント走り方
-permalink: /nogifes_event/
 ---
 
 <time class="post-modified" datetime="2026-09-30 18:26:33">

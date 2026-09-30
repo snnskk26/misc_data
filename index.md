@@ -7,18 +7,18 @@ layout: default
 
 ## 乃木恋
 
-* [ボーダー 一覧表]({{ '/nogikoi_border_table/' | relative_url }})
-* [ボーダー 平均値]({{ '/nogikoi_border_mean/' | relative_url }})
-* [彼イベ走り方]({{ '/nogikoi_event/' | relative_url }})
+* [ボーダー 一覧表]({{ '/nogikoi/border_table.html' | relative_url }})
+* [ボーダー 平均値]({{ '/nogikoi/border_mean.html' | relative_url }})
+* [彼イベ走り方]({{ '/nogikoi/event.html' | relative_url }})
 
 ## 乃木フェス
 
-* [ボーダー 一覧表]({{ '/nogifes_border_table/' | relative_url }})
-* [ボーダー 平均値]({{ '/nogifes_border_mean/' | relative_url }})
-* [イベント走り方]({{ '/nogifes_event/' | relative_url }})
+* [ボーダー 一覧表]({{ '/nogifes/border_table.html' | relative_url }})
+* [ボーダー 平均値]({{ '/nogifes/border_mean.html' | relative_url }})
+* [イベント走り方]({{ '/nogifes/event.html' | relative_url }})
 
 ## 乃木フラ
 
-* [ボーダー 一覧表]({{ '/nogifra_border_table/' | relative_url }})
-* [ボーダー 平均値]({{ '/nogifra_border_mean/' | relative_url }})
-* [キミプロ走り方]({{ '/nogifra_event/' | relative_url }})
+* [ボーダー 一覧表]({{ '/nogifra/border_table.html' | relative_url }})
+* [ボーダー 平均値]({{ '/nogifra/border_mean.html' | relative_url }})
+* [キミプロ走り方]({{ '/nogifra/event.html' | relative_url }})

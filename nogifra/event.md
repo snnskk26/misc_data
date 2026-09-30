@@ -1,7 +1,6 @@
 ---
 layout: default
 title: 乃木フラ / キミプロ走り方
-permalink: /nogifra_event/
 ---
 
 <time class="post-modified" datetime="2026-09-30 18:53:10">
