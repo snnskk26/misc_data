@@ -1,3 +1,15 @@
 title: 雑多なデータ置き場
+description: 乃木恋、乃木フェス、乃木フラ非公式の個人的なデータまとめ
+author: snnskk26
+
+url: https://snnskk26.github.io
+baseurl: /misc_data
+
 copyright_year: 2026
-copyright_owner: snnskk26
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+exclude:
+  - README.md
