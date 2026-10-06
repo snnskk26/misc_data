@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 乃木フラ / キミプロ走り方
-last_modified_at: 2026-09-30 18:53:10
+last_modified_at: 2026-09-30T18:53:10+09:00
 ---
 
 <time class="post-modified" datetime="{{ page.last_modified_at }}">

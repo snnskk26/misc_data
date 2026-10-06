@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 乃木フェス / ボーダー 一覧表
-last_modified_at: 2026-10-06 12:44:05
+last_modified_at: 2026-10-06T13:17:06+09:00
 ---
 
 <time class="post-modified" datetime="{{ page.last_modified_at }}">

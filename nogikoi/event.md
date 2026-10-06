@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 乃木恋 / 彼イベ走り方
-last_modified_at: 2026-09-30 19:14:39
+last_modified_at: 2026-09-30T19:14:39+09:00
 ---
 
 <time class="post-modified" datetime="{{ page.last_modified_at }}">

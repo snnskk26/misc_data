@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 乃木フェス / イベント走り方
-last_modified_at: 2026-09-30 18:26:33
+last_modified_at: 2026-09-30T18:26:33+09:00
 ---
 
 <time class="post-modified" datetime="{{ page.last_modified_at }}">

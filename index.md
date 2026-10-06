@@ -1,6 +1,6 @@
 ---
 layout: default
-last_modified_at: 2026-09-30 23:39:24
+last_modified_at: 2026-09-30T23:39:24+09:00
 ---
 
 <time class="post-modified" datetime="{{ page.last_modified_at }}">
