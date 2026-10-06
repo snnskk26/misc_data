@@ -1,10 +1,11 @@
 ---
 layout: default
 title: 乃木フェス / ボーダー 一覧表
+last_modified_at: 2026-10-06 12:44:05
 ---
 
-<time class="post-modified" datetime="2026-09-28 13:02:34">
-Last modified at 2026-09-28 13:02:34
+<time class="post-modified" datetime="{{ page.last_modified_at }}">
+Last modified at {{ page.last_modified_at }}
 </time>
 
 ## (世界はここにある)
@@ -14,7 +15,7 @@ Last modified at 2026-09-28 13:02:34
   <dt>景品</dt><dd>リアルイベント参加権利、チケットホルダー</dd>
 </dl>
 
-## (Fake Doctor)
+## FAKE or TRUE (Fake Doctor)
 
 <dl>
   <dt>期間</dt><dd>2026/10/04 - 10/13</dd>

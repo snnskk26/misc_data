@@ -1,10 +1,11 @@
 ---
 layout: default
 title: 乃木恋 / 彼イベ走り方
+last_modified_at: 2026-09-30 19:14:39
 ---
 
-<time class="post-modified" datetime="2026-09-30 19:14:39">
-Last modified at 2026-09-30 19:14:39
+<time class="post-modified" datetime="{{ page.last_modified_at }}">
+Last modified at {{ page.last_modified_at }}
 </time>
 
 主に無課金者向けのイベント走り方です。

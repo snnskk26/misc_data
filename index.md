@@ -1,6 +1,11 @@
 ---
 layout: default
+last_modified_at: 2026-09-30 23:39:24
 ---
+
+<time class="post-modified" datetime="{{ page.last_modified_at }}">
+Last modified at {{ page.last_modified_at }}
+</time>
 
 乃木恋、乃木フェス、乃木フラ非公式の個人的なデータまとめです。
 掲載データは個人で収集・整理・分析したものであり、開発元・運営会社とは一切関係ありません。
