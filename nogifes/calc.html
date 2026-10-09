@@ -1,0 +1,272 @@
+---
+layout: default
+title: 乃木フェス / ボーダー予測・必要石数計算
+last_modified_at: 2026-10-10T02:57:00+09:00
+default_end: 2026-10-13
+---
+
+<link rel="stylesheet" href="{{ '/style_calc.css' | relative_url }}">
+
+<time class="post-modified" datetime="{{ page.last_modified_at }}">
+Last modified at {{ page.last_modified_at }}
+</time>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyodide.js"></script>
+
+現時点の各種情報から乃木フェスボーダーの予測および必要石数の算出を行います。
+なお、値を保証するものではありませんので自己責任でご利用ください。
+
+<h2>ボーダー予測</h2>
+<p class="subtitle">
+今現在のボーダー値を入力することで、最終的なボーダーを予測します。
+</p>
+<p class="subtitle">
+イベント期間外でも予測したい場合、
+現在時刻から入力された終了日までの経過時間で予測するため、
+その分終了日をずらして入力してください。<br>
+例: 残り 4 日時点でのボーダーが分かっている場合、終了日を今日から 4 日後にする。
+</p>
+
+<section class="panel">
+  <h3 class="section-heading">
+    <span class="section-number">01</span>
+    基本設定
+  </h3>
+
+  <div class="form-grid">
+    <div class="field">
+      <label for="end_poly">終了日</label>
+      <div class="input-wrap">
+        <input id="end_poly" type="date" value="{{ page.default_end }}">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="score">ボーダー値</label>
+      <div class="input-wrap">
+        <input id="score" type="text" value="1,000,000" inputmode="numeric">
+      </div>
+    </div>
+  </div>
+
+  <div class="toggle-row">
+    <div>
+      <div class="toggle-title">強制予測設定</div>
+      <div class="toggle-description">
+        データ不足で低精度でも強制的に予測します
+      </div>
+    </div>
+
+    <label class="switch">
+      <input id="force" type="checkbox">
+      <span class="switch-track"></span>
+    </label>
+  </div>
+
+  <div class="actions">
+    <button id="button_poly" type="button" onclick="evaluatePythonPoly()" disabled>
+      <span>計算開始</span>
+    </button>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="result-heading">
+    <h3 class="section-heading">
+      <span class="section-number">02</span>
+      計算結果
+    </h3>
+  </div>
+
+  <textarea id="result_poly" disabled></textarea>
+</section>
+
+<h2>必要石数計算</h2>
+<p class="subtitle">
+今現在の各種条件を入力することで、
+目標ポイント到達に必要な石数および時間を概算します。
+</p>
+
+<section class="panel">
+  <h3 class="section-heading">
+    <span class="section-number">01</span>
+    基本設定
+  </h3>
+
+  <div class="form-grid">
+    <div class="field">
+      <label for="end_calc">終了日</label>
+      <div class="input-wrap">
+        <input id="end_calc" type="date" value="{{ page.default_end }}">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="lp">LP</label>
+      <div class="input-wrap">
+        <input id="lp" type="number" value="150" min="0">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="sec">イベント曲時間</label>
+      <div class="input-wrap">
+        <input id="sec" type="number" value="180" min="0">
+        <span class="unit">秒</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="bonus">合計特攻値 (イベントトップページの数値)</label>
+      <div class="input-wrap">
+        <input id="bonus" type="text" value="1,000" inputmode="numeric">
+        <span class="unit">%</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <h3 class="section-heading">
+    <span class="section-number">02</span>
+    アイテム・ポイント・バックグラウンド設定
+  </h3>
+
+  <div class="form-grid">
+    <div class="field">
+      <label for="items">イベントアイテム所持数</label>
+      <div class="input-wrap">
+        <input id="items" type="text" value="0" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="current">現在のポイント</label>
+      <div class="input-wrap">
+        <input id="current" type="text" value="0" inputmode="numeric">
+        <span class="unit">pt</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="boosts">ブーストアイテム所持数</label>
+      <div class="input-wrap">
+        <input id="boosts" type="text" value="120" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="target">目標ポイント</label>
+      <div class="input-wrap">
+        <input id="target" type="text" value="1,000,000" inputmode="numeric">
+        <span class="unit">pt</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="toggle-row">
+    <div>
+      <div class="toggle-title">バックグラウンド設定</div>
+      <div class="toggle-description">
+        全てバックグラウンドを利用したと想定します
+      </div>
+    </div>
+
+    <label class="switch">
+      <input id="bg" type="checkbox" checked>
+      <span class="switch-track"></span>
+    </label>
+  </div>
+
+  <div class="actions">
+    <button id="button_calc" type="button" onclick="evaluatePythonCalc()" disabled>
+      <span>計算開始</span>
+    </button>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="result-heading">
+    <h3 class="section-heading">
+      <span class="section-number">03</span>
+      計算結果
+    </h3>
+  </div>
+
+  <textarea id="result_calc" disabled></textarea>
+</section>
+
+<script>
+  async function init() {
+    let pyodide = await loadPyodide();
+    await pyodide.loadPackage("numpy");
+
+    button_poly.disabled = false;
+    result_poly.value = "";
+
+    button_calc.disabled = false;
+    result_calc.value = "";
+
+    return pyodide;
+  }
+
+  let pyodideReadyPromise = init();
+</script>
+
+<script>
+  // poly.py
+  const p_poly = "ZnJvbSBkYXRldGltZSBpbXBvcnQgZGF0ZXRpbWUgYXMgZHQKaW1wb3J0IG51bXB5IGFzIG5wCmRlZiBtYWluKCk6CglDPS4xO0Q9MztFPVtbLTM5MjMuODE0ODc4ODY2OTk4Nyw2MjY3MS43MTkzNjY0NjQ0MiwtNDU1MDAzLjQxNTE1Mjc0LDE3NjYzMDIuMjQwMDI0MzQ5N10sWy00MTU3LjUxNjE0NzMxNTY0MSw1ODExMi40NDU0MzI1OTAyNywtMzE4NjY5LjQ4NzM0NTAxMzk0LDk3NDcxMy4yODc1MTExNDc4XSxbLTQzNzYuMjM0NTg1MzkwMTM0LDgzMjQyLjQwMzg0ODU1NjA3LC03MjQyNzQuNDM2NTAxNjkxOCwzMDA2NDU0LjM5MTI4OTU1N10sWy0yNTM3LjU1ODA5MTg5MTQ3NjYsNDc4OTUuMTA4NTE3OTczMTQsLTM4MDE0NC4wNzEyNTg2MjI1LDE0MTYzOTUuMDY2NzkxMzM2M10sWy0yMzA3MC4zNDA5NjAzMzc5OSwzMTUzMDkuMDU5MDMxNjA2MzYsLTE1OTI0MjIuMzYwOTkxOTQ5MiwzNTA0OTk2LjUzMjQ5NjMyXSxbLTMxMDYuODQxODM2OTYwMjEyMywzODc1OS4yNzkzNzU2NTc4MSwtMjA1OTE0LjU1OTM2Mjc1NDg0LDYyNDUyNS4zMDM0NjM0MzExXSxbLTE1MjQxLjU2MDk1NzAxMjYyLDI5OTg4Mi45OTQ4NDc4NjkyLC0yNjgyNzQwLjM0MDM0OTE2NiwxMDk1MjYwNi41MjQ2MzY5MjhdLFstMjk1OS45OTE4Nzc1ODgwNDUsNTY2MDcuNTc1NjM0NTg2MjU0LC00Mzc2NTAuODI2MjEzMjY5ODQsMTUyNzE2OC42MjA2Njg5NzAzXSxbLTEwNTQ5LjkxMjEwNTc2NjAwMSwyOTMxNjcuNzU1NzYzMTg0MSwtMzcyMTQyOC42OTI3MTYxMDQsMTczMTAzNDEuOTk2MjI5MzY1XSxbLTE0ODUuNzA0ODkyNjk3OTcxNywyODQ3Mi42NTQyMzg2NTE4MTYsLTI3MjU3OS45MjMxODExMDc0LDEyMzI3NjEuODc3NTIzMzgxM10sWzI0NDEuNjI4ODI0NDc5MjY0LDc0NDkxLjgyNzg2MzY0MTM3LC0xODY4ODAxLjU1NzkxMzY5OTQsODk2Nzk5OS43ODgxMTE4NzVdLFstMjEzNi4yMjg1MjQ1NDEwNTY3LDMzNjI4LjMyNzAzOTM5NDcyLC0yNzY5NTkuMTU0MTgxOTU5NywxMTYzNDUwLjUwMjE2MTA4NV0sWy02NTkuMjgwMzMxODY1OTM3NiwxMjA5Ni40MjQyNTIwNTM4MiwtOTc4MDQuNTg4MDYzODMwOTYsMzQ3NTA3LjIyNzEzNTg2ODZdLFstNDcyLjUzMjg4NzUxMjA3OTg3LDc5ODEuMzc3Mzg1MTE5Mjk3LC01NTc1OC41Nzg0OTExODI2MiwxNzUwNDUuODgyMDg2OTMxOTNdLFstNTEwNS4xMTUzOTIzODk1NTksODM5MDUuNDUzODg1MjA5MzQsLTU5OTgzMC4yNzYxNTU1Mjc5LDIzNzQ0NTEuMjU4MTA5NTgxN10sWy0zMzMzLjcxODYwNjQ0ODk5NjUsNjAwNjkuMjAzNjA3MjEwMjMsLTQyMzkwNi4zMTExMjQwMTU2LDE0MDAxMjUuNDk2MTgwMjMxMl0sWy0zMzIzLjIxNzU3NDY3MTkzOCw1OTU3Mi4wMTI2NzYwNzYwNCwtNDYyMjc5Ljk2MDcyNjM0OTI3LDE3ODE1NDAuNDY2NTkxNTg0N10sWy0xNjU3Ljk0ODU0OTczMDQxOTcsMzA0OTMuMjM4OTgyNzc5NTEyLC0yNDU0MDAuODE2MDY2NTQ4NDMsOTUyNzcwLjUyOTE0MDMwNjRdLFstMzY1NS4zNDY3MDYwODE4NzQzLDYzMTk4Ljk3ODMxMDc3NTExNCwtNTAyNDQwLjg1Mjc5OTU5NDg3LDIwOTI5ODQuNTY5ODYxMDM1XSxbLTUyNi4xMTQxMTczNTk2MzMzLDEzNDUzLjM2MjcyNjM3ODU2NiwtMTc0NzM0LjA3NjUzNTQ1OTg3LDg4NDM3Ni43ODU5MzE4NjUyXSxbLTE0MDAuOTQxNzExMzMxMjkwNywyNTA1NS4zNTc5ODA5MTI5MiwtMTc4NzQ4LjE4NTc1OTQyMTg1LDYwNjExMC42ODc1NjI4MzY4XSxbLTY2NS4yMzY5MDM2MDIxMjk5LDExODY3LjUxODQ2NTkzMTQ4NCwtODgwNjcuNzU5MDMyMjg5MTMsMzE3ODc4Ljg3MDQ0MDM0N10sWy05NzEuMTA3NTc2NDQ5ODUyLDE3MTI4LjgwMDE2NjMyOTE0MywtMTM3NTMyLjEzNTg3MjMyMzc0LDU0MjExNC40NDgyNDMzNTg1XSxbLTQxOS41ODM3OTI3NTc5ODg3Niw3ODk4LjM2MjcwMDUzMDc4NiwtNzE5MTQuMTcxNTE0NTQ1NDcsMzA2MjEwLjk2NDY3ODQ5NzZdLFstOTM5OC4wOTgxNDk0OTE1MTYsMTk2MTEwLjY2ODk1NTc4NTA1LC0xNjA4MTEzLjc4MzU5MzUyNSw1MjAzMzU3LjU1ODkzNjU1NV0sWy0xMDE3LjQ5OTU1MDAyMDMxNTQsMTc3NTIuMjkwNzY0MjU3MTM0LC0xMzEwODYuMTQ4OTI4NDg4NjYsNDM4NzkyLjg2MTkzMzAzMTNdLFstMjA5OC4xMjMxODUzNDI2MzY2LDMyMDE0LjM5OTk3MTk3NzIzLC0xOTg5NTMuMjY0NTI3OTY2Nyw2MjEzMTMuOTgzNDA2NTE2XSxbLTEwMDcuNDYxMjA4MDMwMDIwOSwxNTg0MC41NTQxMjg0NjI2MjMsLTEwNjk4Ni42MTk0NzQwMTAzMSwzNjA0NTIuNDk3NjIwMDcxOF0sWy0yMzgwLjU1Mzk5Mjc3MjcwMiw0MzI3MS4yMzAzMDM4ODk4MiwtMzQ5Mjg1LjQ1MzUyMDY5NTYsMTM5MzUxNi40MTUwOTgxOTkyXSxbLTE4MDMuNDU4OTExMzcwNjIwNCwzMjQ4Ni4wMzAxNDIzNjMyOSwtMjM3Nzg2Ljg2OTA4OTgxNDksODI0NDM5LjAwMTU4ODY2NjddLFstMjcwNS4zNDI0OTUwMDU2NTQ3LDQzNTE3Ljc0MTI0ODQ2MDk5LC0zMjAzODAuNjA3NDI0ODg1ODUsMTMwNDcyNS4xNzg1ODA2ODY1XSxbLTE4NDMuNjAzODk3MjQ3Nzc1NCwzMzUwMy40MjIwOTM2NzMyNywtMjQ0NjUzLjg4NTA2NzA2OTU1LDgyMDAxOC4yNjkxMjgxNzUyXSxbLTM0ODUuMTM5Njc5NjMxODU1LDU5NjEyLjkzODM2MTE1NTczNSwtNDUwODgwLjk3NDI0MTM5NTUsMTc3Mjc2OC4wNzk1NjI4ODg1XSxbLTIwNTUuOTQ0ODQ4NDcwMDU3NCwzNjE0OC4yNDYxMDE1ODM2NzQsLTI2ODU4NS43NjE2NDgxODg5LDk4Nzc0Mi4xNjY0MDAyOTM5XSxbLTMwMTkuNTc5NTQ1NzQ3MzU4LDUzOTI2LjIxNjAwNTU5OTYzLC00MjY1ODguOTc5MTc4MjkxNTcsMTY5MTE4MC42MTIwNzg2MzYyXSxbLTE3NTUuNjEwNzY0MTcyNDgyMywzMjc5Mi4wODk1OTM2NDMxOCwtMjU4MzcxLjk3NzYwNDA1MTksOTU2NjI2LjM0OTM4NzYxMjFdLFstMjEzOC44MTc4NTY3NTkyNTIsMzc2MzcuNjcwNTk4ODk5ODUsLTI2OTM0MC42NDIxNDE5NzE5LDg1NzA4OS40MDMyNjg4MTgyXSxbLTkzNy4xMDYwNjE0OTMxMTA3LDE1NTM2Ljg3NDQ4NTc5MDYxLC0xMDcyMjguNzAxMTI2MjExOTksMzUwMDg2LjcxMDY5MDg5N10sWy0zNDI1LjcxNjIwMDM2NjQxNjYsMTYxOTEyLjM4Njc4MzA3ODQ2LC0zMjY1ODgzLjc0MzY1MDcwNywxODgyMzI1NC41MDc4MTc0NDddLFsxMzIuMTUwNTIwMTAzNzA5NDgsMTA4NS4zMzY0ODQxNTkyODkzLC0yMTAxODMuMzYxMjQxNTQ3NSwxNzMyMzcwLjA5Mzg5NzI2NjNdLFstMTA3MS4wNjA2NjQwOTI0NzEsMTY3MjEyLjA4MzcxMDAxNDcsLTQzMjM0OTYuMDMyMjY2NTI1LDI2MzI4NTE0LjQyOTEyMDA4Ml0sWy04ODUuMzAwODIwOTU4MDE0MSwyNjIwNi4yNzA1NjgyOTYyNTUsLTM4NTY3OS4xNzQwNDQ3ODAyNiwyMDA4MjU2LjQzMjU4NzMwOF1dO0Y9ZHQubm93KCk7Rz1kdC5mcm9taXNvZm9ybWF0KGVuZCkucmVwbGFjZShob3VyPTIzLG1pbnV0ZT01OSk7SD0oRy1GKS50b3RhbF9zZWNvbmRzKCkvNjAqKjIvMjQ7ST1bbnAucG9seTFkKEEpZm9yIEEgaW4gRV07QT17QjpBKDApKkIgZm9yIEEgaW4gSSBmb3IgQiBpbltzY29yZS9BKEgpXX07QT1kaWN0KHNvcnRlZChBLml0ZW1zKCksa2V5PWxhbWJkYSB4OmFicyh4WzBdLTEpKSk7Qj1bQiBmb3IoQSxCKWluIEEuaXRlbXMoKWlmIGFicyhBLTEpPENdCglpZiBub3QgQiBhbmQgZm9yY2U6Qj1saXN0KEEudmFsdWVzKCkpWzpEXQoJaWYgQjpKPW5wLmF2ZXJhZ2UoQik7cmV0dXJuIGYi44Oc44O844OA44O85LqI5ris5YCkIDoge0o6LC4wZn0iCgllbHNlOnJldHVybifjg4fjg7zjgr/kuI3otrPjga7jgZ/jgoHkuojmuKzkuI3lj68uLi5fKDozIOOAjeKIoClfJwp0cnk6cmV0PW1haW4oKQpleGNlcHQgRXhjZXB0aW9uIGFzIGU6cmV0PWUKcmV0";
+
+  const button_poly = document.getElementById("button_poly");
+  const result_poly = document.getElementById("result_poly");
+
+  const bytes_poly = Uint8Array.from(atob(p_poly), c => c.charCodeAt());
+  const pythonCode_poly = new TextDecoder().decode(bytes_poly);
+
+  button_poly.disabled = true;
+  result_poly.value = "初期化中...";
+
+  async function evaluatePythonPoly() {
+    let pyodide = await pyodideReadyPromise;
+    try {
+      pyodide.globals.set("end",   document.getElementById("end_poly").value);
+      pyodide.globals.set("score", Number(document.getElementById("score").value.replace(/,/g, "")));
+      pyodide.globals.set("force", document.getElementById("force").checked);
+      result_poly.value = pyodide.runPython(pythonCode_poly);
+    } catch (err) {
+      result_poly.value = err;
+    }
+  }
+</script>
+
+<script>
+  // calc.py
+  const p_calc = "ZnJvbSBkYXRldGltZSBpbXBvcnQgZGF0ZXRpbWUgYXMgZHQKZGVmIG1haW4oKToKCU09ZHQubm93KCk7Tj1kdC5mcm9taXNvZm9ybWF0KGVuZCkucmVwbGFjZShob3VyPTIzLG1pbnV0ZT01OSk7Qj0oTi1NKS50b3RhbF9zZWNvbmRzKCkvNjAqKjI7Tz1CLzI0CglpZiBiZzpEPTA7Qz00Ljg3NQoJZWxzZTpEPTEuNDQ7Qz01LjEKCVA9ODc1O0E9MTE1MDtRPUEqLjI7Uj1BKihib251cy8xMDArRCk7Uz1BKigwIGlmIGJnIGVsc2UgLjIpO0U9QStRK1IrUztUPUUvUDtVPTEuMzc2O1Y9My4yMDg7Vz0zNjAvbHArMjAwL0MvbHA7Rj10YXJnZXQtY3VycmVudDtHPUYvVC1pdGVtcztIPUcvQztJPUcvVTtKPShILW1pbihib29zdHMsSC8yKSkvbHAtTypXO1g9Sio1IGlmIEo+MCBlbHNlIDA7WT0xNTtaPUYvRTthPShzZWMrWSkqWi82MCoqMjtiPShJLW1pbihib29zdHMqVixJLzIpKS82MCoqMjtLPWErYjtMPWYi5b+F6KaB55+z5pWwICAgICAgIDog57SEIHtYOiwuMGZ9IOefs1xuXG4iK2Yi5q6L44KK5pmC6ZaTICAgICAgIDog57SEIHtCOiwuMWZ9IOaZgumWk1xuIitmIuW/heimgeODqeOCpOODluaZgumWkyA6IOe0hCB7SzosLjFmfSDmmYLplpMiCglpZiBCPEs6TCs9J1xuXG7igLvliLDpgZTkuI3lj6/jgILlv4XopoHjg6njgqTjg5bmmYLplpPjgYzmrovjgormmYLplpPjgpLotoXjgYjjgabjgYTjgb7jgZnjgIInCglyZXR1cm4gTAp0cnk6cmV0PW1haW4oKQpleGNlcHQgRXhjZXB0aW9uIGFzIGU6cmV0PWUKcmV0";
+
+  const button_calc = document.getElementById("button_calc");
+  const result_calc = document.getElementById("result_calc");
+
+  const bytes_calc = Uint8Array.from(atob(p_calc), c => c.charCodeAt());
+  const pythonCode_calc = new TextDecoder().decode(bytes_calc);
+
+  button_calc.disabled = true;
+  result_calc.value = "初期化中...";
+
+  async function evaluatePythonCalc() {
+    let pyodide = await pyodideReadyPromise;
+    try {
+      pyodide.globals.set("end",     document.getElementById("end_calc").value);
+      pyodide.globals.set("lp",      Number(document.getElementById("lp").value));
+      pyodide.globals.set("sec",     Number(document.getElementById("sec").value));
+      pyodide.globals.set("bonus",   Number(document.getElementById("bonus").value.replace(/,/g, "")));
+      pyodide.globals.set("items",   Number(document.getElementById("items").value.replace(/,/g, "")));
+      pyodide.globals.set("boosts",  Number(document.getElementById("boosts").value.replace(/,/g, "")));
+      pyodide.globals.set("current", Number(document.getElementById("current").value.replace(/,/g, "")));
+      pyodide.globals.set("target",  Number(document.getElementById("target").value.replace(/,/g, "")));
+      pyodide.globals.set("bg",      document.getElementById("bg").checked);
+      result_calc.value = pyodide.runPython(pythonCode_calc);
+    } catch (err) {
+      result_calc.value = err;
+    }
+  }
+</script>
