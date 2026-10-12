@@ -1,8 +1,9 @@
 ---
 layout: default
 title: 乃木フェス / ボーダー予測・必要石数計算
-last_modified_at: 2026-10-10T02:57:00+09:00
+last_modified_at: 2026-10-13T02:43:50+09:00
 default_end: 2026-10-13
+default_days: 9.375
 ---
 
 <link rel="stylesheet" href="{{ '/style_calc.css' | relative_url }}">
@@ -13,18 +14,12 @@ Last modified at {{ page.last_modified_at }}
 
 <script src="https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyodide.js"></script>
 
-現時点の各種情報から乃木フェスボーダーの予測および必要石数の算出を行います。
+各種条件から乃木フェスボーダーの予測および必要石数の算出を行います。
 なお、値を保証するものではありませんので自己責任でご利用ください。
 
 <h2>ボーダー予測</h2>
 <p class="subtitle">
 今現在のボーダー値を入力することで、最終的なボーダーを予測します。
-</p>
-<p class="subtitle">
-イベント期間外でも予測したい場合、
-現在時刻から入力された終了日までの経過時間で予測するため、
-その分終了日をずらして入力してください。<br>
-例: 残り 4 日時点でのボーダーが分かっている場合、終了日を今日から 4 日後にする。
 </p>
 
 <section class="panel">
@@ -33,16 +28,31 @@ Last modified at {{ page.last_modified_at }}
     基本設定
   </h3>
 
+  <div class="radio-group">
+    <input type="radio" name="formTypePoly" id="radio_end_poly" checked>
+    <label for="radio_end_poly">終了日指定</label>
+
+    <input type="radio" name="formTypePoly" id="radio_days_poly">
+    <label for="radio_days_poly">残り日数指定</label>
+  </div>
+
   <div class="form-grid">
-    <div class="field">
+    <div id="form_end_poly" class="field">
       <label for="end_poly">終了日</label>
       <div class="input-wrap">
         <input id="end_poly" type="date" value="{{ page.default_end }}">
       </div>
     </div>
 
+    <div id="form_days_poly" class="field">
+      <label for="days_poly">残り日数</label>
+      <div class="input-wrap">
+        <input id="days_poly" type="text" value="{{ page.default_days }}">
+      </div>
+    </div>
+
     <div class="field">
-      <label for="score">ボーダー値</label>
+      <label for="score">現在のボーダー値</label>
       <div class="input-wrap">
         <input id="score" type="text" value="1,000,000" inputmode="numeric">
       </div>
@@ -93,26 +103,40 @@ Last modified at {{ page.last_modified_at }}
     基本設定
   </h3>
 
+  <div class="radio-group">
+    <input type="radio" name="formTypeCalc" id="radio_end_calc" checked>
+    <label for="radio_end_calc">終了日指定</label>
+
+    <input type="radio" name="formTypeCalc" id="radio_days_calc">
+    <label for="radio_days_calc">残り日数指定</label>
+  </div>
+
   <div class="form-grid">
-    <div class="field">
+    <div id="form_end_calc" class="field">
       <label for="end_calc">終了日</label>
       <div class="input-wrap">
         <input id="end_calc" type="date" value="{{ page.default_end }}">
       </div>
     </div>
 
-    <div class="field">
-      <label for="lp">LP</label>
+    <div id="form_days_calc" class="field">
+      <label for="days_calc">残り日数</label>
       <div class="input-wrap">
-        <input id="lp" type="number" value="150" min="0">
+        <input id="days_calc" type="text" value="{{ page.default_days }}">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="lp">最大 LP</label>
+      <div class="input-wrap">
+        <input id="lp" type="text" value="150">
       </div>
     </div>
 
     <div class="field">
       <label for="sec">イベント曲時間</label>
       <div class="input-wrap">
-        <input id="sec" type="number" value="180" min="0">
-        <span class="unit">秒</span>
+        <input id="sec" type="text" value="2:17">
       </div>
     </div>
 
@@ -168,7 +192,7 @@ Last modified at {{ page.last_modified_at }}
     <div>
       <div class="toggle-title">バックグラウンド設定</div>
       <div class="toggle-description">
-        全てバックグラウンドを利用したと想定します
+        全てバックグラウンド周回想定で計算します
       </div>
     </div>
 
@@ -202,10 +226,10 @@ Last modified at {{ page.last_modified_at }}
     await pyodide.loadPackage("numpy");
 
     button_poly.disabled = false;
-    result_poly.value = "";
+    result_poly.value += "準備完了";
 
     button_calc.disabled = false;
-    result_calc.value = "";
+    result_calc.value += "準備完了";
 
     return pyodide;
   }
@@ -215,58 +239,68 @@ Last modified at {{ page.last_modified_at }}
 
 <script>
   // poly.py
-  const p_poly = "ZnJvbSBkYXRldGltZSBpbXBvcnQgZGF0ZXRpbWUgYXMgZHQKaW1wb3J0IG51bXB5IGFzIG5wCmRlZiBtYWluKCk6CglDPS4xO0Q9MztFPVtbLTM5MjMuODE0ODc4ODY2OTk4Nyw2MjY3MS43MTkzNjY0NjQ0MiwtNDU1MDAzLjQxNTE1Mjc0LDE3NjYzMDIuMjQwMDI0MzQ5N10sWy00MTU3LjUxNjE0NzMxNTY0MSw1ODExMi40NDU0MzI1OTAyNywtMzE4NjY5LjQ4NzM0NTAxMzk0LDk3NDcxMy4yODc1MTExNDc4XSxbLTQzNzYuMjM0NTg1MzkwMTM0LDgzMjQyLjQwMzg0ODU1NjA3LC03MjQyNzQuNDM2NTAxNjkxOCwzMDA2NDU0LjM5MTI4OTU1N10sWy0yNTM3LjU1ODA5MTg5MTQ3NjYsNDc4OTUuMTA4NTE3OTczMTQsLTM4MDE0NC4wNzEyNTg2MjI1LDE0MTYzOTUuMDY2NzkxMzM2M10sWy0yMzA3MC4zNDA5NjAzMzc5OSwzMTUzMDkuMDU5MDMxNjA2MzYsLTE1OTI0MjIuMzYwOTkxOTQ5MiwzNTA0OTk2LjUzMjQ5NjMyXSxbLTMxMDYuODQxODM2OTYwMjEyMywzODc1OS4yNzkzNzU2NTc4MSwtMjA1OTE0LjU1OTM2Mjc1NDg0LDYyNDUyNS4zMDM0NjM0MzExXSxbLTE1MjQxLjU2MDk1NzAxMjYyLDI5OTg4Mi45OTQ4NDc4NjkyLC0yNjgyNzQwLjM0MDM0OTE2NiwxMDk1MjYwNi41MjQ2MzY5MjhdLFstMjk1OS45OTE4Nzc1ODgwNDUsNTY2MDcuNTc1NjM0NTg2MjU0LC00Mzc2NTAuODI2MjEzMjY5ODQsMTUyNzE2OC42MjA2Njg5NzAzXSxbLTEwNTQ5LjkxMjEwNTc2NjAwMSwyOTMxNjcuNzU1NzYzMTg0MSwtMzcyMTQyOC42OTI3MTYxMDQsMTczMTAzNDEuOTk2MjI5MzY1XSxbLTE0ODUuNzA0ODkyNjk3OTcxNywyODQ3Mi42NTQyMzg2NTE4MTYsLTI3MjU3OS45MjMxODExMDc0LDEyMzI3NjEuODc3NTIzMzgxM10sWzI0NDEuNjI4ODI0NDc5MjY0LDc0NDkxLjgyNzg2MzY0MTM3LC0xODY4ODAxLjU1NzkxMzY5OTQsODk2Nzk5OS43ODgxMTE4NzVdLFstMjEzNi4yMjg1MjQ1NDEwNTY3LDMzNjI4LjMyNzAzOTM5NDcyLC0yNzY5NTkuMTU0MTgxOTU5NywxMTYzNDUwLjUwMjE2MTA4NV0sWy02NTkuMjgwMzMxODY1OTM3NiwxMjA5Ni40MjQyNTIwNTM4MiwtOTc4MDQuNTg4MDYzODMwOTYsMzQ3NTA3LjIyNzEzNTg2ODZdLFstNDcyLjUzMjg4NzUxMjA3OTg3LDc5ODEuMzc3Mzg1MTE5Mjk3LC01NTc1OC41Nzg0OTExODI2MiwxNzUwNDUuODgyMDg2OTMxOTNdLFstNTEwNS4xMTUzOTIzODk1NTksODM5MDUuNDUzODg1MjA5MzQsLTU5OTgzMC4yNzYxNTU1Mjc5LDIzNzQ0NTEuMjU4MTA5NTgxN10sWy0zMzMzLjcxODYwNjQ0ODk5NjUsNjAwNjkuMjAzNjA3MjEwMjMsLTQyMzkwNi4zMTExMjQwMTU2LDE0MDAxMjUuNDk2MTgwMjMxMl0sWy0zMzIzLjIxNzU3NDY3MTkzOCw1OTU3Mi4wMTI2NzYwNzYwNCwtNDYyMjc5Ljk2MDcyNjM0OTI3LDE3ODE1NDAuNDY2NTkxNTg0N10sWy0xNjU3Ljk0ODU0OTczMDQxOTcsMzA0OTMuMjM4OTgyNzc5NTEyLC0yNDU0MDAuODE2MDY2NTQ4NDMsOTUyNzcwLjUyOTE0MDMwNjRdLFstMzY1NS4zNDY3MDYwODE4NzQzLDYzMTk4Ljk3ODMxMDc3NTExNCwtNTAyNDQwLjg1Mjc5OTU5NDg3LDIwOTI5ODQuNTY5ODYxMDM1XSxbLTUyNi4xMTQxMTczNTk2MzMzLDEzNDUzLjM2MjcyNjM3ODU2NiwtMTc0NzM0LjA3NjUzNTQ1OTg3LDg4NDM3Ni43ODU5MzE4NjUyXSxbLTE0MDAuOTQxNzExMzMxMjkwNywyNTA1NS4zNTc5ODA5MTI5MiwtMTc4NzQ4LjE4NTc1OTQyMTg1LDYwNjExMC42ODc1NjI4MzY4XSxbLTY2NS4yMzY5MDM2MDIxMjk5LDExODY3LjUxODQ2NTkzMTQ4NCwtODgwNjcuNzU5MDMyMjg5MTMsMzE3ODc4Ljg3MDQ0MDM0N10sWy05NzEuMTA3NTc2NDQ5ODUyLDE3MTI4LjgwMDE2NjMyOTE0MywtMTM3NTMyLjEzNTg3MjMyMzc0LDU0MjExNC40NDgyNDMzNTg1XSxbLTQxOS41ODM3OTI3NTc5ODg3Niw3ODk4LjM2MjcwMDUzMDc4NiwtNzE5MTQuMTcxNTE0NTQ1NDcsMzA2MjEwLjk2NDY3ODQ5NzZdLFstOTM5OC4wOTgxNDk0OTE1MTYsMTk2MTEwLjY2ODk1NTc4NTA1LC0xNjA4MTEzLjc4MzU5MzUyNSw1MjAzMzU3LjU1ODkzNjU1NV0sWy0xMDE3LjQ5OTU1MDAyMDMxNTQsMTc3NTIuMjkwNzY0MjU3MTM0LC0xMzEwODYuMTQ4OTI4NDg4NjYsNDM4NzkyLjg2MTkzMzAzMTNdLFstMjA5OC4xMjMxODUzNDI2MzY2LDMyMDE0LjM5OTk3MTk3NzIzLC0xOTg5NTMuMjY0NTI3OTY2Nyw2MjEzMTMuOTgzNDA2NTE2XSxbLTEwMDcuNDYxMjA4MDMwMDIwOSwxNTg0MC41NTQxMjg0NjI2MjMsLTEwNjk4Ni42MTk0NzQwMTAzMSwzNjA0NTIuNDk3NjIwMDcxOF0sWy0yMzgwLjU1Mzk5Mjc3MjcwMiw0MzI3MS4yMzAzMDM4ODk4MiwtMzQ5Mjg1LjQ1MzUyMDY5NTYsMTM5MzUxNi40MTUwOTgxOTkyXSxbLTE4MDMuNDU4OTExMzcwNjIwNCwzMjQ4Ni4wMzAxNDIzNjMyOSwtMjM3Nzg2Ljg2OTA4OTgxNDksODI0NDM5LjAwMTU4ODY2NjddLFstMjcwNS4zNDI0OTUwMDU2NTQ3LDQzNTE3Ljc0MTI0ODQ2MDk5LC0zMjAzODAuNjA3NDI0ODg1ODUsMTMwNDcyNS4xNzg1ODA2ODY1XSxbLTE4NDMuNjAzODk3MjQ3Nzc1NCwzMzUwMy40MjIwOTM2NzMyNywtMjQ0NjUzLjg4NTA2NzA2OTU1LDgyMDAxOC4yNjkxMjgxNzUyXSxbLTM0ODUuMTM5Njc5NjMxODU1LDU5NjEyLjkzODM2MTE1NTczNSwtNDUwODgwLjk3NDI0MTM5NTUsMTc3Mjc2OC4wNzk1NjI4ODg1XSxbLTIwNTUuOTQ0ODQ4NDcwMDU3NCwzNjE0OC4yNDYxMDE1ODM2NzQsLTI2ODU4NS43NjE2NDgxODg5LDk4Nzc0Mi4xNjY0MDAyOTM5XSxbLTMwMTkuNTc5NTQ1NzQ3MzU4LDUzOTI2LjIxNjAwNTU5OTYzLC00MjY1ODguOTc5MTc4MjkxNTcsMTY5MTE4MC42MTIwNzg2MzYyXSxbLTE3NTUuNjEwNzY0MTcyNDgyMywzMjc5Mi4wODk1OTM2NDMxOCwtMjU4MzcxLjk3NzYwNDA1MTksOTU2NjI2LjM0OTM4NzYxMjFdLFstMjEzOC44MTc4NTY3NTkyNTIsMzc2MzcuNjcwNTk4ODk5ODUsLTI2OTM0MC42NDIxNDE5NzE5LDg1NzA4OS40MDMyNjg4MTgyXSxbLTkzNy4xMDYwNjE0OTMxMTA3LDE1NTM2Ljg3NDQ4NTc5MDYxLC0xMDcyMjguNzAxMTI2MjExOTksMzUwMDg2LjcxMDY5MDg5N10sWy0zNDI1LjcxNjIwMDM2NjQxNjYsMTYxOTEyLjM4Njc4MzA3ODQ2LC0zMjY1ODgzLjc0MzY1MDcwNywxODgyMzI1NC41MDc4MTc0NDddLFsxMzIuMTUwNTIwMTAzNzA5NDgsMTA4NS4zMzY0ODQxNTkyODkzLC0yMTAxODMuMzYxMjQxNTQ3NSwxNzMyMzcwLjA5Mzg5NzI2NjNdLFstMTA3MS4wNjA2NjQwOTI0NzEsMTY3MjEyLjA4MzcxMDAxNDcsLTQzMjM0OTYuMDMyMjY2NTI1LDI2MzI4NTE0LjQyOTEyMDA4Ml0sWy04ODUuMzAwODIwOTU4MDE0MSwyNjIwNi4yNzA1NjgyOTYyNTUsLTM4NTY3OS4xNzQwNDQ3ODAyNiwyMDA4MjU2LjQzMjU4NzMwOF1dO0Y9ZHQubm93KCk7Rz1kdC5mcm9taXNvZm9ybWF0KGVuZCkucmVwbGFjZShob3VyPTIzLG1pbnV0ZT01OSk7SD0oRy1GKS50b3RhbF9zZWNvbmRzKCkvNjAqKjIvMjQ7ST1bbnAucG9seTFkKEEpZm9yIEEgaW4gRV07QT17QjpBKDApKkIgZm9yIEEgaW4gSSBmb3IgQiBpbltzY29yZS9BKEgpXX07QT1kaWN0KHNvcnRlZChBLml0ZW1zKCksa2V5PWxhbWJkYSB4OmFicyh4WzBdLTEpKSk7Qj1bQiBmb3IoQSxCKWluIEEuaXRlbXMoKWlmIGFicyhBLTEpPENdCglpZiBub3QgQiBhbmQgZm9yY2U6Qj1saXN0KEEudmFsdWVzKCkpWzpEXQoJaWYgQjpKPW5wLmF2ZXJhZ2UoQik7cmV0dXJuIGYi44Oc44O844OA44O85LqI5ris5YCkIDoge0o6LC4wZn0iCgllbHNlOnJldHVybifjg4fjg7zjgr/kuI3otrPjga7jgZ/jgoHkuojmuKzkuI3lj68uLi5fKDozIOOAjeKIoClfJwp0cnk6cmV0PW1haW4oKQpleGNlcHQgRXhjZXB0aW9uIGFzIGU6cmV0PWUKcmV0";
-
-  const button_poly = document.getElementById("button_poly");
-  const result_poly = document.getElementById("result_poly");
+  const p_poly = "ZnJvbSBkYXRldGltZSBpbXBvcnQgZGF0ZXRpbWUgYXMgZHQKaW1wb3J0IG51bXB5IGFzIG5wCmRlZiBtYWluKGFyZ3MpOgoJRT0nc2NvcmUnO0E9YXJncwoJdHJ5OgoJCUY9LjE7Rz0zO0g9W1stMzkyMy44MTQ4Nzg4NjY5OTg3LDYyNjcxLjcxOTM2NjQ2NDQyLC00NTUwMDMuNDE1MTUyNzQsMTc2NjMwMi4yNDAwMjQzNDk3XSxbLTQxNTcuNTE2MTQ3MzE1NjQxLDU4MTEyLjQ0NTQzMjU5MDI3LC0zMTg2NjkuNDg3MzQ1MDEzOTQsOTc0NzEzLjI4NzUxMTE0NzhdLFstNDM3Ni4yMzQ1ODUzOTAxMzQsODMyNDIuNDAzODQ4NTU2MDcsLTcyNDI3NC40MzY1MDE2OTE4LDMwMDY0NTQuMzkxMjg5NTU3XSxbLTI1MzcuNTU4MDkxODkxNDc2Niw0Nzg5NS4xMDg1MTc5NzMxNCwtMzgwMTQ0LjA3MTI1ODYyMjUsMTQxNjM5NS4wNjY3OTEzMzYzXSxbLTIzMDcwLjM0MDk2MDMzNzk5LDMxNTMwOS4wNTkwMzE2MDYzNiwtMTU5MjQyMi4zNjA5OTE5NDkyLDM1MDQ5OTYuNTMyNDk2MzJdLFstMzEwNi44NDE4MzY5NjAyMTIzLDM4NzU5LjI3OTM3NTY1NzgxLC0yMDU5MTQuNTU5MzYyNzU0ODQsNjI0NTI1LjMwMzQ2MzQzMTFdLFstMTUyNDEuNTYwOTU3MDEyNjIsMjk5ODgyLjk5NDg0Nzg2OTIsLTI2ODI3NDAuMzQwMzQ5MTY2LDEwOTUyNjA2LjUyNDYzNjkyOF0sWy0yOTU5Ljk5MTg3NzU4ODA0NSw1NjYwNy41NzU2MzQ1ODYyNTQsLTQzNzY1MC44MjYyMTMyNjk4NCwxNTI3MTY4LjYyMDY2ODk3MDNdLFstMTA1NDkuOTEyMTA1NzY2MDAxLDI5MzE2Ny43NTU3NjMxODQxLC0zNzIxNDI4LjY5MjcxNjEwNCwxNzMxMDM0MS45OTYyMjkzNjVdLFstMTQ4NS43MDQ4OTI2OTc5NzE3LDI4NDcyLjY1NDIzODY1MTgxNiwtMjcyNTc5LjkyMzE4MTEwNzQsMTIzMjc2MS44Nzc1MjMzODEzXSxbMjQ0MS42Mjg4MjQ0NzkyNjQsNzQ0OTEuODI3ODYzNjQxMzcsLTE4Njg4MDEuNTU3OTEzNjk5NCw4OTY3OTk5Ljc4ODExMTg3NV0sWy0yMTM2LjIyODUyNDU0MTA1NjcsMzM2MjguMzI3MDM5Mzk0NzIsLTI3Njk1OS4xNTQxODE5NTk3LDExNjM0NTAuNTAyMTYxMDg1XSxbLTY1OS4yODAzMzE4NjU5Mzc2LDEyMDk2LjQyNDI1MjA1MzgyLC05NzgwNC41ODgwNjM4MzA5NiwzNDc1MDcuMjI3MTM1ODY4Nl0sWy00NzIuNTMyODg3NTEyMDc5ODcsNzk4MS4zNzczODUxMTkyOTcsLTU1NzU4LjU3ODQ5MTE4MjYyLDE3NTA0NS44ODIwODY5MzE5M10sWy01MTA1LjExNTM5MjM4OTU1OSw4MzkwNS40NTM4ODUyMDkzNCwtNTk5ODMwLjI3NjE1NTUyNzksMjM3NDQ1MS4yNTgxMDk1ODE3XSxbLTMzMzMuNzE4NjA2NDQ4OTk2NSw2MDA2OS4yMDM2MDcyMTAyMywtNDIzOTA2LjMxMTEyNDAxNTYsMTQwMDEyNS40OTYxODAyMzEyXSxbLTMzMjMuMjE3NTc0NjcxOTM4LDU5NTcyLjAxMjY3NjA3NjA0LC00NjIyNzkuOTYwNzI2MzQ5MjcsMTc4MTU0MC40NjY1OTE1ODQ3XSxbLTE2NTcuOTQ4NTQ5NzMwNDE5NywzMDQ5My4yMzg5ODI3Nzk1MTIsLTI0NTQwMC44MTYwNjY1NDg0Myw5NTI3NzAuNTI5MTQwMzA2NF0sWy0zNjU1LjM0NjcwNjA4MTg3NDMsNjMxOTguOTc4MzEwNzc1MTE0LC01MDI0NDAuODUyNzk5NTk0ODcsMjA5Mjk4NC41Njk4NjEwMzVdLFstNTI2LjExNDExNzM1OTYzMzMsMTM0NTMuMzYyNzI2Mzc4NTY2LC0xNzQ3MzQuMDc2NTM1NDU5ODcsODg0Mzc2Ljc4NTkzMTg2NTJdLFstMTQwMC45NDE3MTEzMzEyOTA3LDI1MDU1LjM1Nzk4MDkxMjkyLC0xNzg3NDguMTg1NzU5NDIxODUsNjA2MTEwLjY4NzU2MjgzNjhdLFstNjY1LjIzNjkwMzYwMjEyOTksMTE4NjcuNTE4NDY1OTMxNDg0LC04ODA2Ny43NTkwMzIyODkxMywzMTc4NzguODcwNDQwMzQ3XSxbLTk3MS4xMDc1NzY0NDk4NTIsMTcxMjguODAwMTY2MzI5MTQzLC0xMzc1MzIuMTM1ODcyMzIzNzQsNTQyMTE0LjQ0ODI0MzM1ODVdLFstNDE5LjU4Mzc5Mjc1Nzk4ODc2LDc4OTguMzYyNzAwNTMwNzg2LC03MTkxNC4xNzE1MTQ1NDU0NywzMDYyMTAuOTY0Njc4NDk3Nl0sWy05Mzk4LjA5ODE0OTQ5MTUxNiwxOTYxMTAuNjY4OTU1Nzg1MDUsLTE2MDgxMTMuNzgzNTkzNTI1LDUyMDMzNTcuNTU4OTM2NTU1XSxbLTEwMTcuNDk5NTUwMDIwMzE1NCwxNzc1Mi4yOTA3NjQyNTcxMzQsLTEzMTA4Ni4xNDg5Mjg0ODg2Niw0Mzg3OTIuODYxOTMzMDMxM10sWy0yMDk4LjEyMzE4NTM0MjYzNjYsMzIwMTQuMzk5OTcxOTc3MjMsLTE5ODk1My4yNjQ1Mjc5NjY3LDYyMTMxMy45ODM0MDY1MTZdLFstMTAwNy40NjEyMDgwMzAwMjA5LDE1ODQwLjU1NDEyODQ2MjYyMywtMTA2OTg2LjYxOTQ3NDAxMDMxLDM2MDQ1Mi40OTc2MjAwNzE4XSxbLTIzODAuNTUzOTkyNzcyNzAyLDQzMjcxLjIzMDMwMzg4OTgyLC0zNDkyODUuNDUzNTIwNjk1NiwxMzkzNTE2LjQxNTA5ODE5OTJdLFstMTgwMy40NTg5MTEzNzA2MjA0LDMyNDg2LjAzMDE0MjM2MzI5LC0yMzc3ODYuODY5MDg5ODE0OSw4MjQ0MzkuMDAxNTg4NjY2N10sWy0yNzA1LjM0MjQ5NTAwNTY1NDcsNDM1MTcuNzQxMjQ4NDYwOTksLTMyMDM4MC42MDc0MjQ4ODU4NSwxMzA0NzI1LjE3ODU4MDY4NjVdLFstMTg0My42MDM4OTcyNDc3NzU0LDMzNTAzLjQyMjA5MzY3MzI3LC0yNDQ2NTMuODg1MDY3MDY5NTUsODIwMDE4LjI2OTEyODE3NTJdLFstMzQ4NS4xMzk2Nzk2MzE4NTUsNTk2MTIuOTM4MzYxMTU1NzM1LC00NTA4ODAuOTc0MjQxMzk1NSwxNzcyNzY4LjA3OTU2Mjg4ODVdLFstMjA1NS45NDQ4NDg0NzAwNTc0LDM2MTQ4LjI0NjEwMTU4MzY3NCwtMjY4NTg1Ljc2MTY0ODE4ODksOTg3NzQyLjE2NjQwMDI5MzldLFstMzAxOS41Nzk1NDU3NDczNTgsNTM5MjYuMjE2MDA1NTk5NjMsLTQyNjU4OC45NzkxNzgyOTE1NywxNjkxMTgwLjYxMjA3ODYzNjJdLFstMTc1NS42MTA3NjQxNzI0ODIzLDMyNzkyLjA4OTU5MzY0MzE4LC0yNTgzNzEuOTc3NjA0MDUxOSw5NTY2MjYuMzQ5Mzg3NjEyMV0sWy0yMTM4LjgxNzg1Njc1OTI1MiwzNzYzNy42NzA1OTg4OTk4NSwtMjY5MzQwLjY0MjE0MTk3MTksODU3MDg5LjQwMzI2ODgxODJdLFstOTM3LjEwNjA2MTQ5MzExMDcsMTU1MzYuODc0NDg1NzkwNjEsLTEwNzIyOC43MDExMjYyMTE5OSwzNTAwODYuNzEwNjkwODk3XSxbLTM0MjUuNzE2MjAwMzY2NDE2NiwxNjE5MTIuMzg2NzgzMDc4NDYsLTMyNjU4ODMuNzQzNjUwNzA3LDE4ODIzMjU0LjUwNzgxNzQ0N10sWzEzMi4xNTA1MjAxMDM3MDk0OCwxMDg1LjMzNjQ4NDE1OTI4OTMsLTIxMDE4My4zNjEyNDE1NDc1LDE3MzIzNzAuMDkzODk3MjY2M10sWy0xMDcxLjA2MDY2NDA5MjQ3MSwxNjcyMTIuMDgzNzEwMDE0NywtNDMyMzQ5Ni4wMzIyNjY1MjUsMjYzMjg1MTQuNDI5MTIwMDgyXSxbLTg4NS4zMDA4MjA5NTgwMTQxLDI2MjA2LjI3MDU2ODI5NjI1NSwtMzg1Njc5LjE3NDA0NDc4MDI2LDIwMDgyNTYuNDMyNTg3MzA4XV07QXw9e0I6ZmxvYXQoQVtCXS5yZXBsYWNlKCcsJywnJykpZm9yIEIgaW5bRV19CgkJaWYgQVsncmVtYWluJ106RD1mbG9hdChBWydkYXlzJ10pCgkJZWxzZTpJPWR0Lm5vdygpO0o9ZHQuZnJvbWlzb2Zvcm1hdChBWydlbmQnXSkucmVwbGFjZShob3VyPTIzLG1pbnV0ZT01OSk7RD0oSi1JKS50b3RhbF9zZWNvbmRzKCkvNjAqKjIvMjQKCQlLPVtucC5wb2x5MWQoQSlmb3IgQSBpbiBIXTtCPXtDOkIoMCkqQyBmb3IgQiBpbiBLIGZvciBDIGluW0FbRV0vQihEKV19O0I9ZGljdChzb3J0ZWQoQi5pdGVtcygpLGtleT1sYW1iZGEgeDphYnMoeFswXS0xKSkpO0M9W0IgZm9yKEEsQilpbiBCLml0ZW1zKClpZiBhYnMoQS0xKTxGXQoJCWlmIG5vdCBDIGFuZCBBWydmb3JjZSddOkM9bGlzdChCLnZhbHVlcygpKVs6R10KCQlpZiBDOkw9bnAuYXZlcmFnZShDKTtyZXR1cm4gZiLjg5zjg7zjg4Djg7zkuojmuKzlgKQgOiB7TDosLjBmfSIKCQllbHNlOnJldHVybifjg4fjg7zjgr/kuI3otrPjga7jgZ/jgoHkuojmuKzkuI3lj68uLi5fKDozIOOAjeKIoClfJwoJZXhjZXB0IEV4Y2VwdGlvbiBhcyBNOnJldHVybiBzdHIoTSk=";
 
   const bytes_poly = Uint8Array.from(atob(p_poly), c => c.charCodeAt());
   const pythonCode_poly = new TextDecoder().decode(bytes_poly);
+
+  const button_poly = document.getElementById("button_poly");
+  const result_poly = document.getElementById("result_poly");
 
   button_poly.disabled = true;
   result_poly.value = "初期化中...";
 
   async function evaluatePythonPoly() {
     let pyodide = await pyodideReadyPromise;
-    try {
-      pyodide.globals.set("end",   document.getElementById("end_poly").value);
-      pyodide.globals.set("score", Number(document.getElementById("score").value.replace(/,/g, "")));
-      pyodide.globals.set("force", document.getElementById("force").checked);
-      result_poly.value = pyodide.runPython(pythonCode_poly);
-    } catch (err) {
-      result_poly.value = err;
-    }
+
+    pyodide.runPython(pythonCode_poly);
+
+    using func_poly = pyodide.globals.get("main");
+    using args_poly = pyodide.toPy({
+      remain: document.getElementById("radio_days_poly").checked,
+      end:    document.getElementById("end_poly").value,
+      days:   document.getElementById("days_poly").value,
+      score:  document.getElementById("score").value,
+      force:  document.getElementById("force").checked
+    });
+
+    result_poly.value = func_poly(args_poly);
   }
 </script>
 
 <script>
   // calc.py
-  const p_calc = "ZnJvbSBkYXRldGltZSBpbXBvcnQgZGF0ZXRpbWUgYXMgZHQKZGVmIG1haW4oKToKCU09ZHQubm93KCk7Tj1kdC5mcm9taXNvZm9ybWF0KGVuZCkucmVwbGFjZShob3VyPTIzLG1pbnV0ZT01OSk7Qj0oTi1NKS50b3RhbF9zZWNvbmRzKCkvNjAqKjI7Tz1CLzI0CglpZiBiZzpEPTA7Qz00Ljg3NQoJZWxzZTpEPTEuNDQ7Qz01LjEKCVA9ODc1O0E9MTE1MDtRPUEqLjI7Uj1BKihib251cy8xMDArRCk7Uz1BKigwIGlmIGJnIGVsc2UgLjIpO0U9QStRK1IrUztUPUUvUDtVPTEuMzc2O1Y9My4yMDg7Vz0zNjAvbHArMjAwL0MvbHA7Rj10YXJnZXQtY3VycmVudDtHPUYvVC1pdGVtcztIPUcvQztJPUcvVTtKPShILW1pbihib29zdHMsSC8yKSkvbHAtTypXO1g9Sio1IGlmIEo+MCBlbHNlIDA7WT0xNTtaPUYvRTthPShzZWMrWSkqWi82MCoqMjtiPShJLW1pbihib29zdHMqVixJLzIpKS82MCoqMjtLPWErYjtMPWYi5b+F6KaB55+z5pWwICAgICAgIDog57SEIHtYOiwuMGZ9IOefs1xuXG4iK2Yi5q6L44KK5pmC6ZaTICAgICAgIDog57SEIHtCOiwuMWZ9IOaZgumWk1xuIitmIuW/heimgeODqeOCpOODluaZgumWkyA6IOe0hCB7SzosLjFmfSDmmYLplpMiCglpZiBCPEs6TCs9J1xuXG7igLvliLDpgZTkuI3lj6/jgILlv4XopoHjg6njgqTjg5bmmYLplpPjgYzmrovjgormmYLplpPjgpLotoXjgYjjgabjgYTjgb7jgZnjgIInCglyZXR1cm4gTAp0cnk6cmV0PW1haW4oKQpleGNlcHQgRXhjZXB0aW9uIGFzIGU6cmV0PWUKcmV0";
-
-  const button_calc = document.getElementById("button_calc");
-  const result_calc = document.getElementById("result_calc");
+  const p_calc = "ZnJvbSBkYXRldGltZSBpbXBvcnQgZGF0ZXRpbWUgYXMgZHQKZGVmIG1haW4oYXJncyk6CglVPSd0YXJnZXQnO1Q9J2N1cnJlbnQnO1M9J2l0ZW1zJztSPSdib251cyc7ST0nYm9vc3RzJztGPSdscCc7Qj0nc2VjJztBPWFyZ3MKCXRyeToKCQlBfD17QjpmbG9hdChBW0JdLnJlcGxhY2UoJywnLCcnKSlmb3IgQiBpbltGLFIsUyxJLFQsVV19CgkJaWYnOidpbiBBW0JdOlYsVz1BW0JdLnNwbGl0KCc6Jyk7QVtCXT1mbG9hdChWKSo2MCtmbG9hdChXKQoJCWVsc2U6QVtCXT1mbG9hdChBW0JdKQoJCWlmIEFbJ3JlbWFpbiddOkM9ZmxvYXQoQVsnZGF5cyddKQoJCWVsc2U6WD1kdC5ub3coKTtZPWR0LmZyb21pc29mb3JtYXQoQVsnZW5kJ10pLnJlcGxhY2UoaG91cj0yMyxtaW51dGU9NTkpO0M9KFktWCkudG90YWxfc2Vjb25kcygpLzYwKioyLzI0CgkJaWYgQVsnYmcnXTpKLEQsRz0wLDQuOCwxLjYzCgkJZWxzZTpKLEQsRz0xLjQ0LDUuNSwxLjg5CgkJWj04NzU7RT0xMTUwO2E9RSouMjU7Yj1FKihBW1JdLzEwMCtKKTtjPUUqKDAgaWYgQVsnYmcnXWVsc2UgLjIpO0s9RSthK2IrYztkPUsvWjtlPUQvRztmPTM2MC9BW0ZdKzIwMC9EL0FbRl07TD1BW1VdLUFbVF07TT1ML2QtQVtTXTtOPU0vRDtPPU0vRztQPShOLW1pbihBW0ldLE4vMikpL0FbRl0tQypmO2c9UCo1IGlmIFA+MCBlbHNlIDA7aD0xMDtpPUwvSztqPShBW0JdK2gpKmkvNjAqKjI7az0oTy1taW4oQVtJXSplLE8vMikpLzYwKioyO0g9aitrO1E9ZiLlv4XopoHnn7PmlbAgICAgICAgOiDntIQge2c6LC4wZn0g55+zXG5cbuaui+OCiuaZgumWkyAgICAgICA6IOe0hCB7QyoyNDosLjFmfSDmmYLplpMgKHtDOiwuMWZ9IOaXpSlcbuW/heimgeODqeOCpOODluaZgumWkyA6IOe0hCB7SDosLjFmfSDmmYLplpMgKHtILzI0OiwuMWZ9IOaXpSkiCgkJaWYgQyoyNDxIOlErPSdcblxu4oC75Yiw6YGU5LiN5Y+v44CC5b+F6KaB44Op44Kk44OW5pmC6ZaT44GM5q6L44KK5pmC6ZaT44KS6LaF44GI44Gm44GE44G+44GZ44CCJwoJCXJldHVybiBRCglleGNlcHQgRXhjZXB0aW9uIGFzIGw6cmV0dXJuIHN0cihsKQ==";
 
   const bytes_calc = Uint8Array.from(atob(p_calc), c => c.charCodeAt());
   const pythonCode_calc = new TextDecoder().decode(bytes_calc);
+
+  const button_calc = document.getElementById("button_calc");
+  const result_calc = document.getElementById("result_calc");
 
   button_calc.disabled = true;
   result_calc.value = "初期化中...";
 
   async function evaluatePythonCalc() {
     let pyodide = await pyodideReadyPromise;
-    try {
-      pyodide.globals.set("end",     document.getElementById("end_calc").value);
-      pyodide.globals.set("lp",      Number(document.getElementById("lp").value));
-      pyodide.globals.set("sec",     Number(document.getElementById("sec").value));
-      pyodide.globals.set("bonus",   Number(document.getElementById("bonus").value.replace(/,/g, "")));
-      pyodide.globals.set("items",   Number(document.getElementById("items").value.replace(/,/g, "")));
-      pyodide.globals.set("boosts",  Number(document.getElementById("boosts").value.replace(/,/g, "")));
-      pyodide.globals.set("current", Number(document.getElementById("current").value.replace(/,/g, "")));
-      pyodide.globals.set("target",  Number(document.getElementById("target").value.replace(/,/g, "")));
-      pyodide.globals.set("bg",      document.getElementById("bg").checked);
-      result_calc.value = pyodide.runPython(pythonCode_calc);
-    } catch (err) {
-      result_calc.value = err;
-    }
+
+    pyodide.runPython(pythonCode_calc);
+
+    using func_calc = pyodide.globals.get("main");
+    using args_calc = pyodide.toPy({
+      remain:  document.getElementById("radio_days_calc").checked,
+      end:     document.getElementById("end_calc").value,
+      days:    document.getElementById("days_calc").value,
+      lp:      document.getElementById("lp").value,
+      sec:     document.getElementById("sec").value,
+      bonus:   document.getElementById("bonus").value,
+      items:   document.getElementById("items").value,
+      boosts:  document.getElementById("boosts").value,
+      current: document.getElementById("current").value,
+      target:  document.getElementById("target").value,
+      bg:      document.getElementById("bg").checked
+    });
+
+    result_calc.value = func_calc(args_calc);
   }
 </script>
