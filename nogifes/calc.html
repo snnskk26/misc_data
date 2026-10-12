@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 乃木フェス / ボーダー予測・必要石数計算
-last_modified_at: 2026-10-13T02:43:50+09:00
+last_modified_at: 2026-10-13T02:54:30+09:00
 default_end: 2026-10-13
 default_days: 9.375
 ---
@@ -47,7 +47,7 @@ Last modified at {{ page.last_modified_at }}
     <div id="form_days_poly" class="field">
       <label for="days_poly">残り日数</label>
       <div class="input-wrap">
-        <input id="days_poly" type="text" value="{{ page.default_days }}">
+        <input id="days_poly" type="text" value="{{ page.default_days }}" inputmode="numeric">
       </div>
     </div>
 
@@ -122,21 +122,21 @@ Last modified at {{ page.last_modified_at }}
     <div id="form_days_calc" class="field">
       <label for="days_calc">残り日数</label>
       <div class="input-wrap">
-        <input id="days_calc" type="text" value="{{ page.default_days }}">
+        <input id="days_calc" type="text" value="{{ page.default_days }}" inputmode="numeric">
       </div>
     </div>
 
     <div class="field">
       <label for="lp">最大 LP</label>
       <div class="input-wrap">
-        <input id="lp" type="text" value="150">
+        <input id="lp" type="text" value="150" inputmode="numeric">
       </div>
     </div>
 
     <div class="field">
       <label for="sec">イベント曲時間</label>
       <div class="input-wrap">
-        <input id="sec" type="text" value="2:17">
+        <input id="sec" type="text" value="2:17" inputmode="numeric">
       </div>
     </div>
 
