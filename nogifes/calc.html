@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 乃木フェス / ボーダー予測・必要石数計算
-last_modified_at: 2026-10-13T02:54:30+09:00
+last_modified_at: 2026-10-13T19:36:11+09:00
 default_end: 2026-10-13
 default_days: 9.375
 ---
@@ -251,20 +251,24 @@ Last modified at {{ page.last_modified_at }}
   result_poly.value = "初期化中...";
 
   async function evaluatePythonPoly() {
-    let pyodide = await pyodideReadyPromise;
-
+    const pyodide = await pyodideReadyPromise;
     pyodide.runPython(pythonCode_poly);
 
-    using func_poly = pyodide.globals.get("main");
-    using args_poly = pyodide.toPy({
-      remain: document.getElementById("radio_days_poly").checked,
-      end:    document.getElementById("end_poly").value,
-      days:   document.getElementById("days_poly").value,
-      score:  document.getElementById("score").value,
-      force:  document.getElementById("force").checked
-    });
-
-    result_poly.value = func_poly(args_poly);
+    let func, args;
+    try {
+      func = pyodide.globals.get("main");
+      args = pyodide.toPy({
+        remain: document.getElementById("radio_days_poly").checked,
+        end:    document.getElementById("end_poly").value,
+        days:   document.getElementById("days_poly").value,
+        score:  document.getElementById("score").value,
+        force:  document.getElementById("force").checked
+      });
+      result_poly.value = func(args);
+    } finally {
+      if (func) func.destroy();
+      if (args) args.destroy();
+    }
   }
 </script>
 
@@ -282,25 +286,29 @@ Last modified at {{ page.last_modified_at }}
   result_calc.value = "初期化中...";
 
   async function evaluatePythonCalc() {
-    let pyodide = await pyodideReadyPromise;
-
+    const pyodide = await pyodideReadyPromise;
     pyodide.runPython(pythonCode_calc);
 
-    using func_calc = pyodide.globals.get("main");
-    using args_calc = pyodide.toPy({
-      remain:  document.getElementById("radio_days_calc").checked,
-      end:     document.getElementById("end_calc").value,
-      days:    document.getElementById("days_calc").value,
-      lp:      document.getElementById("lp").value,
-      sec:     document.getElementById("sec").value,
-      bonus:   document.getElementById("bonus").value,
-      items:   document.getElementById("items").value,
-      boosts:  document.getElementById("boosts").value,
-      current: document.getElementById("current").value,
-      target:  document.getElementById("target").value,
-      bg:      document.getElementById("bg").checked
-    });
-
-    result_calc.value = func_calc(args_calc);
+    let func, args;
+    try {
+      func = pyodide.globals.get("main");
+      args = pyodide.toPy({
+        remain:  document.getElementById("radio_days_calc").checked,
+        end:     document.getElementById("end_calc").value,
+        days:    document.getElementById("days_calc").value,
+        lp:      document.getElementById("lp").value,
+        sec:     document.getElementById("sec").value,
+        bonus:   document.getElementById("bonus").value,
+        items:   document.getElementById("items").value,
+        boosts:  document.getElementById("boosts").value,
+        current: document.getElementById("current").value,
+        target:  document.getElementById("target").value,
+        bg:      document.getElementById("bg").checked
+      });
+      result_calc.value = func(args);
+    } finally {
+      if (func) func.destroy();
+      if (args) args.destroy();
+    }
   }
 </script>
