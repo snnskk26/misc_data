@@ -17,4 +17,6 @@ Last modified at {{ page.last_modified_at }}
 
 あとはひたすら定期的にバックグランドを回しましょう。
 
+イベント期間中のボーダー予測および必要な石数の計算は[こちら]({{ '/nogifes/calc.html' | relative_url }})。
+
 以上です。
