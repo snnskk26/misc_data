@@ -1,12 +1,19 @@
 ---
 layout: default
 title: 乃木恋 / ボーダー 一覧表
-last_modified_at: 2026-10-13T18:55:03+09:00
+last_modified_at: 2026-10-28T19:04:31+09:00
 ---
 
 <time class="post-modified" datetime="{{ page.last_modified_at }}">
 Last modified at {{ page.last_modified_at }}
 </time>
+
+## 文化祭EVENT
+
+<dl>
+  <dt>期間</dt><dd>2026/10/26 - 11/08</dd>
+  <dt>景品</dt><dd>リアルイベント, 直筆サイン入りチェキ, 文化祭への招待状</dd>
+</dl>
 
 ## #53 彼氏EVENT
 
